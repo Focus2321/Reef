@@ -17,7 +17,6 @@ final class FeedbackPanelController {
         panel.hidesOnDeactivate = false
         panel.ignoresMouseEvents = true
 
-        iconView.image = NSApp.applicationIconImage
         iconView.imageScaling = .scaleProportionallyUpOrDown
         iconView.setAccessibilityElement(false)
 
@@ -42,9 +41,12 @@ final class FeedbackPanelController {
         ])
     }
 
-    func show(_ message: String) {
+    func show(_ message: String, icon: NSImage? = nil) {
         hideTask?.cancel()
+        iconView.image = icon
+        iconView.isHidden = icon == nil
         messageLabel.stringValue = message
+        messageLabel.alignment = icon == nil ? .center : .left
         panel.center()
         panel.orderFrontRegardless()
 

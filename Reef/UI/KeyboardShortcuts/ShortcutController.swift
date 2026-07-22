@@ -73,7 +73,10 @@ final class ShortcutController {
         }
 
         profileManager.bind(bundleIdentifier: bundleIdentifier, to: number)
-        feedbackController.show("\(application.title) was assigned to \(number)")
+        feedbackController.show(
+            "\(application.title) was assigned to \(number)",
+            icon: application.icon
+        )
     }
     
     private func handleActivate(number: Int) {
