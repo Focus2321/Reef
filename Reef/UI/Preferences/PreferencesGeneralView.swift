@@ -14,6 +14,7 @@ struct PreferencesGeneralView: View {
 //    @AppStorage("hideMenubarIcon") private var hideMenubarIcon = false
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("defaultNumberOrder") private var defaultNumberOrder = "rightHanded"
+    @AppStorage("showCyclePanelOnPrimaryDisplay") private var showCyclePanelOnPrimaryDisplay = false
     
     @State private var hasAccessibilityPermission = AXIsProcessTrusted()
     
@@ -51,6 +52,8 @@ struct PreferencesGeneralView: View {
                     .onChange(of: launchOnLogin) { _, newValue in
                         setLaunchAtLogin(enabled: newValue)
                     }
+
+                Toggle("Show cycle panel on primary display", isOn: $showCyclePanelOnPrimaryDisplay)
                 
 //                Toggle("Hide menubar icon", isOn: $hideMenubarIcon)
                 
@@ -65,7 +68,7 @@ struct PreferencesGeneralView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(height: hasAccessibilityPermission ? 140 : 205)
+        .frame(height: hasAccessibilityPermission ? 175 : 240)
         .onReceive(timer) { _ in
             // Poll for permission changes
             hasAccessibilityPermission = AXIsProcessTrusted()

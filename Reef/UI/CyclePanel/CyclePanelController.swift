@@ -20,6 +20,7 @@ final class CyclePanelController: NSObject {
 
     private let panelContentWidth: CGFloat = 400
     private let maxPanelFrameHeightCap: CGFloat = 520
+    private let showOnPrimaryDisplayDefaultsKey = "showCyclePanelOnPrimaryDisplay"
 
     // Keep these aligned with CyclePanelView.
     private let headerHeight: CGFloat = 44
@@ -67,7 +68,7 @@ final class CyclePanelController: NSObject {
         }
         
         if !panel.isVisible {
-            panel.center()
+            positionPanel()
             panelAnchorCenter = CGPoint(x: panel.frame.midX, y: panel.frame.midY)
             updatePanelSize()
             panel.makeKeyAndOrderFront(nil)
@@ -80,6 +81,28 @@ final class CyclePanelController: NSObject {
             }
             updatePanelSize()
         }
+    }
+
+    private func positionPanel() {
+        guard UserDefaults.standard.bool(forKey: showOnPrimaryDisplayDefaultsKey) else {
+            panel.center()
+            return
+        }
+
+        // NSScreen.main follows keyboard focus; the first screen is the primary/menu-bar display.
+        guard let primaryScreen = NSScreen.screens.first else {
+            panel.center()
+            return
+        }
+
+        panel.setFrameOrigin(Self.centeredOrigin(for: panel.frame.size, in: primaryScreen.visibleFrame))
+    }
+
+    static func centeredOrigin(for panelSize: CGSize, in visibleFrame: CGRect) -> CGPoint {
+        CGPoint(
+            x: visibleFrame.midX - panelSize.width / 2,
+            y: visibleFrame.midY - panelSize.height / 2
+        )
     }
 
     private func updatePanelSize() {
