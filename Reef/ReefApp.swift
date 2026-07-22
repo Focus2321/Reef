@@ -14,7 +14,7 @@ struct ReefApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var profileManager: ProfileManager
     @StateObject private var sparkleConnector = SparkleConnector()
-    @AppStorage("launchOnLogin") private var launchOnLogin = true
+    @AppStorage("launchOnLogin") private var launchOnLogin = false
     
     init() {
         let profileManager = ProfileManager()
