@@ -60,4 +60,23 @@ struct InstantSwitchModeTests {
 
         #expect(index == 0)
     }
+
+    @Test func directSwitchKeepsStableOrderWhenFocusedWindowMovesToFront() {
+        let initialOrder = CyclePanelState.reconciledWindowIDs(
+            previousWindowIDs: [],
+            availableWindowIDs: [10, 20, 30]
+        )
+        let reorderedWindows = CyclePanelState.reconciledWindowIDs(
+            previousWindowIDs: initialOrder,
+            availableWindowIDs: [20, 10, 30]
+        )
+        let nextIndex = CyclePanelState.nextWindowIndex(
+            windowIDs: reorderedWindows.map(Optional.some),
+            focusedWindowID: 20
+        )
+        let nextWindowID = nextIndex.map { reorderedWindows[$0] }
+
+        #expect(reorderedWindows == [10, 20, 30])
+        #expect(nextWindowID == 30)
+    }
 }

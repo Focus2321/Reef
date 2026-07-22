@@ -17,6 +17,8 @@ final class CyclePanelController: NSObject {
     private var keyDownMonitor: Any?
     private var currentApplication: Application?
     private var panelAnchorCenter: CGPoint?
+    private var directCycleApplication: Application?
+    private var directCycleWindowIDs: [CGWindowID] = []
 
     private let panelContentWidth: CGFloat = 400
     private let maxPanelFrameHeightCap: CGFloat = 520
@@ -158,15 +160,39 @@ final class CyclePanelController: NSObject {
             return frontApplication.getFocusedWindow()?.cgWindowID
         }()
 
-        let windowIDs = windows.map(\.cgWindowID)
+        let availableWindowIDs = windows.compactMap(\.cgWindowID)
+        guard availableWindowIDs.count == windows.count else {
+            let windowIDs = windows.map(\.cgWindowID)
+            guard let index = CyclePanelState.nextWindowIndex(
+                windowIDs: windowIDs,
+                focusedWindowID: focusedWindowID
+            ) else {
+                return
+            }
+
+            windows[index].focus()
+            return
+        }
+
+        if directCycleApplication.map({ isSameApplication($0, application) }) != true {
+            directCycleApplication = application
+            directCycleWindowIDs = []
+        }
+
+        directCycleWindowIDs = CyclePanelState.reconciledWindowIDs(
+            previousWindowIDs: directCycleWindowIDs,
+            availableWindowIDs: availableWindowIDs
+        )
+
         guard let index = CyclePanelState.nextWindowIndex(
-            windowIDs: windowIDs,
+            windowIDs: directCycleWindowIDs.map(Optional.some),
             focusedWindowID: focusedWindowID
         ) else {
             return
         }
 
-        windows[index].focus()
+        let nextWindowID = directCycleWindowIDs[index]
+        windows.first { $0.cgWindowID == nextWindowID }?.focus()
     }
     
     func isShowingSwitcher(for application: Application) -> Bool {

@@ -118,6 +118,23 @@ final class CyclePanelState: ObservableObject {
         return (focusedIndex + 1) % windowIDs.count
     }
 
+    nonisolated static func reconciledWindowIDs(
+        previousWindowIDs: [CGWindowID],
+        availableWindowIDs: [CGWindowID]
+    ) -> [CGWindowID] {
+        let availableWindowIDSet = Set(availableWindowIDs)
+        var includedWindowIDs = Set<CGWindowID>()
+
+        let existingWindowIDs = previousWindowIDs.filter {
+            availableWindowIDSet.contains($0) && includedWindowIDs.insert($0).inserted
+        }
+        let newWindowIDs = availableWindowIDs.filter {
+            includedWindowIDs.insert($0).inserted
+        }
+
+        return existingWindowIDs + newWindowIDs
+    }
+
     func removeCurrentItem() {
         guard items.indices.contains(selectedIndex) else { return }
 
