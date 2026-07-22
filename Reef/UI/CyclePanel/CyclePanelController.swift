@@ -86,7 +86,7 @@ final class CyclePanelController: NSObject {
         }
     }
 
-    private func updatePanelSize() {
+    private func updatePanelSize(animate: Bool = false) {
         let itemCount = state.items.count
         let rowsHeight = CGFloat(itemCount) * rowHeight
         let spacingHeight = CGFloat(max(0, itemCount - 1)) * rowSpacing
@@ -112,7 +112,7 @@ final class CyclePanelController: NSObject {
         )
         let newFrame = NSRect(origin: newOrigin, size: targetFrameSize)
 
-        panel.setFrame(newFrame, display: true, animate: false)
+        panel.setFrame(newFrame, display: true, animate: animate)
     }
     
     // Called when user presses Ctrl+[number] again while panel is visible
@@ -195,6 +195,26 @@ final class CyclePanelController: NSObject {
             }
         }
     }
+
+    private func closeSelectedWindow() {
+        guard let window = state.currentWindow else { return }
+
+        let didClose = window.close()
+        if !didClose {
+            NSSound.beep()
+            return
+        }
+
+        withAnimation(.easeInOut(duration: 0.15)) {
+            state.removeCurrentItem()
+        }
+
+        if state.items.isEmpty {
+            hideSwitcher()
+        } else {
+            updatePanelSize(animate: true)
+        }
+    }
     
     private func hideSwitcher() {
         removeFlagsMonitor()
@@ -245,8 +265,19 @@ final class CyclePanelController: NSObject {
                 return nil
             }
 
+            if self.panel.isVisible, Self.isCloseSelectedWindowEvent(event) {
+                Task { @MainActor in
+                    self.closeSelectedWindow()
+                }
+                return nil
+            }
+
             return event
         }
+    }
+
+    static func isCloseSelectedWindowEvent(_ event: NSEvent) -> Bool {
+        event.keyCode == 13 && !event.isARepeat
     }
 
     private func removeKeyDownMonitor() {
