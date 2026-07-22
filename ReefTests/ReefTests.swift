@@ -26,6 +26,43 @@ struct ReefTests {
         #expect(!CyclePanelController.isCloseSelectedWindowEvent(otherKeyDown))
     }
 
+    @MainActor
+    @Test func removingSelectedItemKeepsFollowingItemSelected() {
+        let state = CyclePanelState()
+        state.items = [.action(.launchApp), .action(.openWindow)]
+
+        state.removeCurrentItem()
+
+        #expect(state.items.count == 1)
+        #expect(state.selectedIndex == 0)
+        #expect(state.currentAction == .openWindow)
+    }
+
+    @MainActor
+    @Test func removingLastSelectedItemMovesSelectionBack() {
+        let state = CyclePanelState()
+        state.items = [.action(.launchApp), .action(.openWindow)]
+        state.selectedIndex = 1
+
+        state.removeCurrentItem()
+
+        #expect(state.items.count == 1)
+        #expect(state.selectedIndex == 0)
+        #expect(state.currentAction == .launchApp)
+    }
+
+    @MainActor
+    @Test func removingOnlyItemLeavesEmptySelection() {
+        let state = CyclePanelState()
+        state.items = [.action(.openWindow)]
+
+        state.removeCurrentItem()
+
+        #expect(state.items.isEmpty)
+        #expect(state.selectedIndex == 0)
+        #expect(state.currentItem == nil)
+    }
+
     private func keyDownEvent(keyCode: UInt16, isARepeat: Bool = false) -> NSEvent? {
         NSEvent.keyEvent(
             with: .keyDown,
