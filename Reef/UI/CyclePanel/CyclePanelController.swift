@@ -160,6 +160,17 @@ final class CyclePanelController: NSObject {
             }
         }
     }
+
+    private func closeSelectedWindow() {
+        guard let window = state.currentWindow else { return }
+
+        let didClose = window.close()
+        hideSwitcher()
+
+        if !didClose {
+            NSSound.beep()
+        }
+    }
     
     private func hideSwitcher() {
         removeFlagsMonitor()
@@ -210,8 +221,19 @@ final class CyclePanelController: NSObject {
                 return nil
             }
 
+            if self.panel.isVisible, Self.isCloseSelectedWindowEvent(event) {
+                Task { @MainActor in
+                    self.closeSelectedWindow()
+                }
+                return nil
+            }
+
             return event
         }
+    }
+
+    static func isCloseSelectedWindowEvent(_ event: NSEvent) -> Bool {
+        event.keyCode == 13 && !event.isARepeat
     }
 
     private func removeKeyDownMonitor() {
