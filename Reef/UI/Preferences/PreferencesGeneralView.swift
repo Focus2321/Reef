@@ -10,7 +10,7 @@ import ServiceManagement
 import ApplicationServices
 
 struct PreferencesGeneralView: View {
-    @AppStorage("launchOnLogin") private var launchOnLogin = false
+    @AppStorage("launchOnLogin") private var launchOnLogin = true
 //    @AppStorage("hideMenubarIcon") private var hideMenubarIcon = false
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("defaultNumberOrder") private var defaultNumberOrder = "rightHanded"

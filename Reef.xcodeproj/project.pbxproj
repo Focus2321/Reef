@@ -29,7 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		C0DA3E332E74664400F50FB1 /* Reef Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reef Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0DA3E332E74664400F50FB1 /* Reef.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reef.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DA3E442E74664500F50FB1 /* ReefTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReefTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DA3E4E2E74664500F50FB1 /* ReefUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReefUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -113,7 +113,7 @@
 		C0DA3E342E74664400F50FB1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C0DA3E332E74664400F50FB1 /* Reef Dev.app */,
+				C0DA3E332E74664400F50FB1 /* Reef.app */,
 				C0DA3E442E74664500F50FB1 /* ReefTests.xctest */,
 				C0DA3E4E2E74664500F50FB1 /* ReefUITests.xctest */,
 			);
@@ -143,8 +143,8 @@
 				C0A713C92E749493005B3639 /* KeyboardShortcuts */,
 				629AF8F52F4550F8003B5679 /* Sparkle */,
 			);
-			productName = "Reef Dev";
-			productReference = C0DA3E332E74664400F50FB1 /* Reef Dev.app */;
+			productName = Reef;
+			productReference = C0DA3E332E74664400F50FB1 /* Reef.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C0DA3E432E74664500F50FB1 /* ReefTests */ = {
@@ -433,12 +433,13 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Reef/Reef.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Reef/Preview Content\"";
-				DEVELOPMENT_TEAM = G2HMTWDTAV;
+				DEVELOPMENT_TEAM = 7WCS8GSJ8N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
@@ -460,8 +461,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.focus2321.Reef.dev;
-				PRODUCT_MODULE_NAME = Reef;
-				PRODUCT_NAME = "Reef Dev";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
 				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
@@ -490,7 +490,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Reef/Preview Content\"";
-				DEVELOPMENT_TEAM = G2HMTWDTAV;
+				DEVELOPMENT_TEAM = 7WCS8GSJ8N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
@@ -501,7 +501,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Reef/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reef Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = Reef;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -511,9 +511,8 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.focus2321.Reef.dev;
-				PRODUCT_MODULE_NAME = Reef;
-				PRODUCT_NAME = "Reef Dev";
+				PRODUCT_BUNDLE_IDENTIFIER = xandergouws.Reef;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
 				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
@@ -543,7 +542,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reef Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reef Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reef.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reef";
 			};
 			name = Debug;
 		};
@@ -557,11 +556,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.focus2321.Reef.devTests;
+				PRODUCT_BUNDLE_IDENTIFIER = xandergouws.ReefTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reef Dev.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reef Dev";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reef.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reef";
 			};
 			name = Release;
 		};
@@ -589,7 +588,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.focus2321.Reef.devUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = xandergouws.ReefUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
