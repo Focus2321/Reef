@@ -57,9 +57,13 @@ final class CyclePanelController: NSObject {
     }
     
     // Called when user presses Ctrl+[number]
-    func showSwitcher(for application: Application, startIndex: Int = 0) {
+    func showSwitcher(
+        for application: Application,
+        startIndex: Int = 0,
+        windows: [Window]? = nil
+    ) {
         currentApplication = application
-        state.setApplication(application)
+        state.setApplication(application, windows: windows)
         
         // If starting index is provided (e.g., already on that app), use it
         if startIndex > 0 && startIndex < state.items.count {
@@ -115,21 +119,52 @@ final class CyclePanelController: NSObject {
     func cycleNext() {
         state.cycleNext()
     }
+
+    func focusNextDirectly(for application: Application, windows: [Window]) {
+        guard !windows.isEmpty else {
+            // Match the existing no-window action without requesting a new window.
+            application.activate()
+            return
+        }
+
+        let focusedWindowID: CGWindowID? = {
+            guard let frontApplication = Application.getFrontApplication(),
+                  isSameApplication(frontApplication, application) else {
+                return nil
+            }
+
+            return frontApplication.getFocusedWindow()?.cgWindowID
+        }()
+
+        let windowIDs = windows.map(\.cgWindowID)
+        guard let index = CyclePanelState.nextWindowIndex(
+            windowIDs: windowIDs,
+            focusedWindowID: focusedWindowID
+        ) else {
+            return
+        }
+
+        windows[index].focus()
+    }
     
     func isShowingSwitcher(for application: Application) -> Bool {
         guard let currentApplication else { return false }
-        
-        if let currentBundleID = currentApplication.bundleIdentifier,
-           let targetBundleID = application.bundleIdentifier {
-            return currentBundleID == targetBundleID
+
+        return isSameApplication(currentApplication, application)
+    }
+
+    private func isSameApplication(_ lhs: Application, _ rhs: Application) -> Bool {
+        if let lhsBundleID = lhs.bundleIdentifier,
+           let rhsBundleID = rhs.bundleIdentifier {
+            return lhsBundleID == rhsBundleID
         }
-        
-        if let currentURL = currentApplication.bundleUrl,
-           let targetURL = application.bundleUrl {
-            return currentURL == targetURL
+
+        if let lhsURL = lhs.bundleUrl,
+           let rhsURL = rhs.bundleUrl {
+            return lhsURL == rhsURL
         }
-        
-        return currentApplication.title == application.title
+
+        return lhs.title == rhs.title
     }
     
     // Called when user releases Ctrl

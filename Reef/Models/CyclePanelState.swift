@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import CoreGraphics
 
 enum CyclePanelAction: Hashable {
     case launchApp
@@ -84,11 +85,11 @@ final class CyclePanelState: ObservableObject {
         return nil
     }
     
-    func setApplication(_ application: Application) {
+    func setApplication(_ application: Application, windows providedWindows: [Window]? = nil) {
         self.applicationTitle = application.title
         self.applicationIcon = application.icon
         
-        let windows = application.getWindows()
+        let windows = providedWindows ?? application.getWindows()
         if windows.isEmpty {
             let action: CyclePanelAction = application.isRunning ? .openWindow : .launchApp
             self.items = [.action(action)]
@@ -102,6 +103,19 @@ final class CyclePanelState: ObservableObject {
     func cycleNext() {
         guard !items.isEmpty else { return }
         selectedIndex = (selectedIndex + 1) % items.count
+    }
+
+    nonisolated static func nextWindowIndex(
+        windowIDs: [CGWindowID?],
+        focusedWindowID: CGWindowID?
+    ) -> Int? {
+        guard !windowIDs.isEmpty else { return nil }
+        guard let focusedWindowID,
+              let focusedIndex = windowIDs.firstIndex(of: focusedWindowID) else {
+            return 0
+        }
+
+        return (focusedIndex + 1) % windowIDs.count
     }
 
     func removeCurrentItem() {
