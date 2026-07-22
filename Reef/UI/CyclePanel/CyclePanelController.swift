@@ -202,15 +202,27 @@ final class CyclePanelController: NSObject {
         keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self else { return event }
 
-            // Escape closes the switcher.
-            if self.panel.isVisible, event.keyCode == 53 {
+            guard self.panel.isVisible else { return event }
+
+            switch event.keyCode {
+            case 53: // Escape
                 Task { @MainActor in
                     self.hideSwitcher()
                 }
                 return nil
+            case 123: // Left Arrow
+                Task { @MainActor in
+                    self.state.cyclePrevious()
+                }
+                return nil
+            case 124: // Right Arrow
+                Task { @MainActor in
+                    self.state.cycleNext()
+                }
+                return nil
+            default:
+                return event
             }
-
-            return event
         }
     }
 
