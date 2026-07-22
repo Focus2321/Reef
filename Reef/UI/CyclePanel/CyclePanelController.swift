@@ -20,6 +20,7 @@ final class CyclePanelController: NSObject {
 
     private let panelContentWidth: CGFloat = 400
     private let maxPanelFrameHeightCap: CGFloat = 520
+    private let showOnPrimaryDisplayDefaultsKey = "showCyclePanelOnPrimaryDisplay"
 
     // Keep these aligned with CyclePanelView.
     private let headerHeight: CGFloat = 44
@@ -71,7 +72,7 @@ final class CyclePanelController: NSObject {
         }
         
         if !panel.isVisible {
-            panel.center()
+            positionPanel()
             panelAnchorCenter = CGPoint(x: panel.frame.midX, y: panel.frame.midY)
             updatePanelSize()
             panel.makeKeyAndOrderFront(nil)
@@ -84,6 +85,27 @@ final class CyclePanelController: NSObject {
             }
             updatePanelSize()
         }
+    }
+
+    private func positionPanel() {
+        // Before Reef activates, main follows the focused window; the first screen is primary.
+        let targetScreen = UserDefaults.standard.bool(forKey: showOnPrimaryDisplayDefaultsKey)
+            ? NSScreen.screens.first
+            : NSScreen.main
+
+        guard let targetScreen else {
+            panel.center()
+            return
+        }
+
+        panel.setFrameOrigin(Self.centeredOrigin(for: panel.frame.size, in: targetScreen.visibleFrame))
+    }
+
+    static func centeredOrigin(for panelSize: CGSize, in visibleFrame: CGRect) -> CGPoint {
+        CGPoint(
+            x: visibleFrame.midX - panelSize.width / 2,
+            y: visibleFrame.midY - panelSize.height / 2
+        )
     }
 
     private func updatePanelSize(animate: Bool = false) {
