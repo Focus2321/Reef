@@ -5,9 +5,10 @@
 //  Created by Xander Gouws on 23-01-2026.
 //
 
-import Foundation
+import AppKit
+import CoreGraphics
 
-enum CyclePanelAction {
+enum CyclePanelAction: Hashable {
     case launchApp
     case openWindow
     
@@ -26,9 +27,26 @@ enum CyclePanelItem {
     case action(CyclePanelAction)
 }
 
+extension CyclePanelItem: Identifiable {
+    enum ID: Hashable {
+        case window(ObjectIdentifier)
+        case action(CyclePanelAction)
+    }
+
+    var id: ID {
+        switch self {
+        case .window(let window):
+            return .window(ObjectIdentifier(window))
+        case .action(let action):
+            return .action(action)
+        }
+    }
+}
+
 @MainActor
 final class CyclePanelState: ObservableObject {
     @Published var applicationTitle: String = ""
+    @Published var applicationIcon: NSImage?
     @Published var items: [CyclePanelItem] = []
     @Published var selectedIndex: Int = 0
     
@@ -67,10 +85,11 @@ final class CyclePanelState: ObservableObject {
         return nil
     }
     
-    func setApplication(_ application: Application) {
+    func setApplication(_ application: Application, windows providedWindows: [Window]? = nil) {
         self.applicationTitle = application.title
+        self.applicationIcon = application.icon
         
-        let windows = application.getWindows()
+        let windows = providedWindows ?? application.getWindows()
         if windows.isEmpty {
             let action: CyclePanelAction = application.isRunning ? .openWindow : .launchApp
             self.items = [.action(action)]
@@ -85,10 +104,31 @@ final class CyclePanelState: ObservableObject {
         guard !items.isEmpty else { return }
         selectedIndex = (selectedIndex + 1) % items.count
     }
+
+    nonisolated static func nextWindowIndex(
+        windowIDs: [CGWindowID?],
+        focusedWindowID: CGWindowID?
+    ) -> Int? {
+        guard !windowIDs.isEmpty else { return nil }
+        guard let focusedWindowID,
+              let focusedIndex = windowIDs.firstIndex(of: focusedWindowID) else {
+            return 0
+        }
+
+        return (focusedIndex + 1) % windowIDs.count
+    }
+
+    func removeCurrentItem() {
+        guard items.indices.contains(selectedIndex) else { return }
+
+        items.remove(at: selectedIndex)
+        selectedIndex = min(selectedIndex, max(0, items.count - 1))
+    }
     
     func reset() {
         items = []
         selectedIndex = 0
         applicationTitle = ""
+        applicationIcon = nil
     }
 }

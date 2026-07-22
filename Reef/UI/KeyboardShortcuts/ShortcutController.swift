@@ -31,10 +31,16 @@ extension KeyboardShortcuts.Name {
 final class ShortcutController {
     private let cycleController: CyclePanelController
     private let profileManager: ProfileManager
+    private let feedbackController: FeedbackPanelController
     
-    init(_ cycleController: CyclePanelController, _ profileManager: ProfileManager) {
+    init(
+        _ cycleController: CyclePanelController,
+        _ profileManager: ProfileManager,
+        _ feedbackController: FeedbackPanelController
+    ) {
         self.cycleController = cycleController
         self.profileManager = profileManager
+        self.feedbackController = feedbackController
         
         setupShortcuts()
     }
@@ -67,8 +73,10 @@ final class ShortcutController {
         }
 
         profileManager.bind(bundleIdentifier: bundleIdentifier, to: number)
-
-        print("Bound \(application.title) to \(number)")
+        feedbackController.show(
+            "\(application.title) was assigned to \(number)",
+            icon: application.icon
+        )
     }
     
     private func handleActivate(number: Int) {
@@ -76,13 +84,36 @@ final class ShortcutController {
             NSSound.beep()
             return
         }
+
+        let instantSwitchMode = InstantSwitchMode.stored()
+        if instantSwitchMode != .never {
+            let windows = binding.getWindows()
+
+            if instantSwitchMode == .always {
+                cycleController.focusNextDirectly(for: binding, windows: windows)
+                return
+            }
+
+            if windows.count == 1 {
+                windows[0].focus()
+                return
+            }
+
+            showSwitcher(for: binding, windows: windows)
+            return
+        }
+
+        showSwitcher(for: binding)
+    }
+
+    private func showSwitcher(for binding: Application, windows: [Window]? = nil) {
         
         // If panel is already visible, cycle if same app; otherwise switch to the newly requested app.
         if cycleController.panel.isVisible {
             if cycleController.isShowingSwitcher(for: binding) {
                 cycleController.cycleNext()
             } else {
-                cycleController.showSwitcher(for: binding)
+                cycleController.showSwitcher(for: binding, windows: windows)
             }
             
             return
@@ -96,7 +127,7 @@ final class ShortcutController {
             startIndex = 1
         }
         
-        cycleController.showSwitcher(for: binding, startIndex: startIndex)
+        cycleController.showSwitcher(for: binding, startIndex: startIndex, windows: windows)
     }
     
     func handleProfile(number: Int) {
@@ -104,7 +135,13 @@ final class ShortcutController {
             NSSound.beep()
             return
         }
-        
+
+        let previousProfileID = profileManager.currentProfileID
         profileManager.switchProfile(id: profileID)
+
+        if previousProfileID != profileID,
+           let profileName = profileManager.currentProfile?.name {
+            feedbackController.show("Switched to \(profileName) profile")
+        }
     }
 }

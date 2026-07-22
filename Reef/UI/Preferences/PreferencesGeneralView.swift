@@ -15,6 +15,7 @@ struct PreferencesGeneralView: View {
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("defaultNumberOrder") private var defaultNumberOrder = "rightHanded"
     @AppStorage("showCyclePanelOnPrimaryDisplay") private var showCyclePanelOnPrimaryDisplay = false
+    @AppStorage(InstantSwitchMode.defaultsKey) private var instantSwitchMode = InstantSwitchMode.never.rawValue
     
     @State private var hasAccessibilityPermission = AXIsProcessTrusted()
     
@@ -63,12 +64,19 @@ struct PreferencesGeneralView: View {
                     Text("Left handed (1, ..., 9, 0)").tag("leftHanded")
                 }
                 .pickerStyle(.menu)
+
+                Picker("Instant switching:", selection: $instantSwitchMode) {
+                    Text("Never").tag(InstantSwitchMode.never.rawValue)
+                    Text("Single-window apps").tag(InstantSwitchMode.singleWindow.rawValue)
+                    Text("Always").tag(InstantSwitchMode.always.rawValue)
+                }
+                .pickerStyle(.menu)
             } footer: {
-                Text("Number order sets the order in which numbers are displayed in the menubar")
+                Text("Number order controls the menubar display. Instant switching focuses windows on key down; single-window mode keeps the switcher for apps with no windows.")
             }
         }
         .formStyle(.grouped)
-        .frame(height: hasAccessibilityPermission ? 175 : 240)
+        .frame(height: hasAccessibilityPermission ? 205 : 270)
         .onReceive(timer) { _ in
             // Poll for permission changes
             hasAccessibilityPermission = AXIsProcessTrusted()

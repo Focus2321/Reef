@@ -58,9 +58,13 @@ final class CyclePanelController: NSObject {
     }
     
     // Called when user presses Ctrl+[number]
-    func showSwitcher(for application: Application, startIndex: Int = 0) {
+    func showSwitcher(
+        for application: Application,
+        startIndex: Int = 0,
+        windows: [Window]? = nil
+    ) {
         currentApplication = application
-        state.setApplication(application)
+        state.setApplication(application, windows: windows)
         
         // If starting index is provided (e.g., already on that app), use it
         if startIndex > 0 && startIndex < state.items.count {
@@ -104,7 +108,7 @@ final class CyclePanelController: NSObject {
         )
     }
 
-    private func updatePanelSize() {
+    private func updatePanelSize(animate: Bool = false) {
         let itemCount = state.items.count
         let rowsHeight = CGFloat(itemCount) * rowHeight
         let spacingHeight = CGFloat(max(0, itemCount - 1)) * rowSpacing
@@ -130,28 +134,59 @@ final class CyclePanelController: NSObject {
         )
         let newFrame = NSRect(origin: newOrigin, size: targetFrameSize)
 
-        panel.setFrame(newFrame, display: true, animate: false)
+        panel.setFrame(newFrame, display: true, animate: animate)
     }
     
     // Called when user presses Ctrl+[number] again while panel is visible
     func cycleNext() {
         state.cycleNext()
     }
+
+    func focusNextDirectly(for application: Application, windows: [Window]) {
+        guard !windows.isEmpty else {
+            // Match the existing no-window action without requesting a new window.
+            application.activate()
+            return
+        }
+
+        let focusedWindowID: CGWindowID? = {
+            guard let frontApplication = Application.getFrontApplication(),
+                  isSameApplication(frontApplication, application) else {
+                return nil
+            }
+
+            return frontApplication.getFocusedWindow()?.cgWindowID
+        }()
+
+        let windowIDs = windows.map(\.cgWindowID)
+        guard let index = CyclePanelState.nextWindowIndex(
+            windowIDs: windowIDs,
+            focusedWindowID: focusedWindowID
+        ) else {
+            return
+        }
+
+        windows[index].focus()
+    }
     
     func isShowingSwitcher(for application: Application) -> Bool {
         guard let currentApplication else { return false }
-        
-        if let currentBundleID = currentApplication.bundleIdentifier,
-           let targetBundleID = application.bundleIdentifier {
-            return currentBundleID == targetBundleID
+
+        return isSameApplication(currentApplication, application)
+    }
+
+    private func isSameApplication(_ lhs: Application, _ rhs: Application) -> Bool {
+        if let lhsBundleID = lhs.bundleIdentifier,
+           let rhsBundleID = rhs.bundleIdentifier {
+            return lhsBundleID == rhsBundleID
         }
-        
-        if let currentURL = currentApplication.bundleUrl,
-           let targetURL = application.bundleUrl {
-            return currentURL == targetURL
+
+        if let lhsURL = lhs.bundleUrl,
+           let rhsURL = rhs.bundleUrl {
+            return lhsURL == rhsURL
         }
-        
-        return currentApplication.title == application.title
+
+        return lhs.title == rhs.title
     }
     
     // Called when user releases Ctrl
@@ -180,6 +215,26 @@ final class CyclePanelController: NSObject {
                     NSSound.beep()
                 }
             }
+        }
+    }
+
+    private func closeSelectedWindow() {
+        guard let window = state.currentWindow else { return }
+
+        let didClose = window.close()
+        if !didClose {
+            NSSound.beep()
+            return
+        }
+
+        withAnimation(.easeInOut(duration: 0.15)) {
+            state.removeCurrentItem()
+        }
+
+        if state.items.isEmpty {
+            hideSwitcher()
+        } else {
+            updatePanelSize(animate: true)
         }
     }
     
@@ -232,8 +287,19 @@ final class CyclePanelController: NSObject {
                 return nil
             }
 
+            if self.panel.isVisible, Self.isCloseSelectedWindowEvent(event) {
+                Task { @MainActor in
+                    self.closeSelectedWindow()
+                }
+                return nil
+            }
+
             return event
         }
+    }
+
+    static func isCloseSelectedWindowEvent(_ event: NSEvent) -> Bool {
+        event.keyCode == 13 && !event.isARepeat
     }
 
     private func removeKeyDownMonitor() {
