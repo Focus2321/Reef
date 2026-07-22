@@ -12,7 +12,7 @@ import Sparkle
 @MainActor
 final class SparkleConnector: ObservableObject {
     private let controller: SPUStandardUpdaterController
-    private let isPreview: Bool
+    private let isDisabled: Bool
     private var didFinishLaunchingObserver: Any?
     private var didStartUpdater = false
     private var didPerformLaunchCheck = false
@@ -21,14 +21,15 @@ final class SparkleConnector: ObservableObject {
     private var canCheckObservation: NSKeyValueObservation?
 
     init() {
-        isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+        isDisabled = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+            || Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
         controller = SPUStandardUpdaterController(
             startingUpdater: false,
             updaterDelegate: nil,
             userDriverDelegate: nil
         )
 
-        guard !isPreview else { return }
+        guard !isDisabled else { return }
 
         canCheckObservation = controller.updater.observe(
             \.canCheckForUpdates,
@@ -59,7 +60,7 @@ final class SparkleConnector: ObservableObject {
     }
 
     func checkForUpdates() {
-        guard !isPreview else { return }
+        guard !isDisabled else { return }
         startUpdaterIfNeeded()
         NSApp.activate(ignoringOtherApps: true)
         controller.checkForUpdates(nil)

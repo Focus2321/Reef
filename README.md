@@ -78,6 +78,15 @@ You can find your macOS version from the ** → About This Mac** page.
 
 ## Development
 
+The Debug build uses the separate `Reef Dev` app identity (`com.focus2321.Reef.dev`), so it can coexist with an installed copy of Reef without sharing profiles, preferences, login-item registration, or Accessibility permission. Release and Archive keep the inherited production identity until the fork's distribution settings are configured deliberately.
+
+1. Open `Reef.xcodeproj` in Xcode.
+2. Select the Reef target under **Signing & Capabilities**, then choose your development team.
+3. Run the Reef scheme on **My Mac** with <kbd>Cmd</kbd> + <kbd>R</kbd>.
+4. Grant Reef Dev access in **System Settings → Privacy & Security → Accessibility**.
+
+Quit the installed Reef app before running Reef Dev because both register the same global keyboard shortcuts. Sparkle updates and launch at login are disabled by default for Reef Dev.
+
 Please share issues and feedback via the [GitHub issues page](https://github.com/gouwsxander/Reef/issues).
 
 Feel free to submit pull requests, though we can't guarantee that we'll get to them.
