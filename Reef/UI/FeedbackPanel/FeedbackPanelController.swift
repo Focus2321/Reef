@@ -9,12 +9,11 @@ import AppKit
 final class FeedbackPanelController {
     private let panel: CyclePanel
     private let iconView = NSImageView()
-    private let titleLabel = NSTextField(labelWithString: "")
     private let messageLabel = NSTextField(labelWithString: "")
     private var hideTask: Task<Void, Never>?
 
     init() {
-        panel = CyclePanel(contentRect: NSRect(x: 0, y: 0, width: 400, height: 76))
+        panel = CyclePanel(contentRect: NSRect(x: 0, y: 0, width: 400, height: 64))
         panel.hidesOnDeactivate = false
         panel.ignoresMouseEvents = true
 
@@ -22,21 +21,11 @@ final class FeedbackPanelController {
         iconView.imageScaling = .scaleProportionallyUpOrDown
         iconView.setAccessibilityElement(false)
 
-        titleLabel.stringValue = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Reef"
-        titleLabel.font = .systemFont(ofSize: 11, weight: .semibold)
-        titleLabel.textColor = NSColor.white.withAlphaComponent(0.7)
-        titleLabel.lineBreakMode = .byTruncatingTail
-
         messageLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         messageLabel.textColor = .white
         messageLabel.lineBreakMode = .byTruncatingTail
 
-        let textStack = NSStackView(views: [titleLabel, messageLabel])
-        textStack.orientation = .vertical
-        textStack.alignment = .leading
-        textStack.spacing = 2
-
-        let contentStack = NSStackView(views: [iconView, textStack])
+        let contentStack = NSStackView(views: [iconView, messageLabel])
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         contentStack.orientation = .horizontal
         contentStack.alignment = .centerY
@@ -48,8 +37,8 @@ final class FeedbackPanelController {
             contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             contentStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            iconView.widthAnchor.constraint(equalToConstant: 36),
-            iconView.heightAnchor.constraint(equalToConstant: 36)
+            iconView.widthAnchor.constraint(equalToConstant: 32),
+            iconView.heightAnchor.constraint(equalToConstant: 32)
         ])
     }
 
