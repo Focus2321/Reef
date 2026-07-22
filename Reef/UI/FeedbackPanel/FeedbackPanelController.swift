@@ -12,8 +12,15 @@ final class FeedbackPanelController {
     private let messageLabel = NSTextField(labelWithString: "")
     private var hideTask: Task<Void, Never>?
 
+    private let panelHeight: CGFloat = 64
+    private let minPanelWidth: CGFloat = 220
+    private let maxPanelWidth: CGFloat = 400
+    private let horizontalPadding: CGFloat = 20
+    private let iconSize: CGFloat = 32
+    private let contentSpacing: CGFloat = 12
+
     init() {
-        panel = CyclePanel(contentRect: NSRect(x: 0, y: 0, width: 400, height: 64))
+        panel = CyclePanel(contentRect: NSRect(x: 0, y: 0, width: 220, height: 64))
         panel.hidesOnDeactivate = false
         panel.ignoresMouseEvents = true
 
@@ -28,16 +35,16 @@ final class FeedbackPanelController {
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         contentStack.orientation = .horizontal
         contentStack.alignment = .centerY
-        contentStack.spacing = 12
+        contentStack.spacing = contentSpacing
 
         guard let contentView = panel.contentView else { return }
         contentView.addSubview(contentStack)
         NSLayoutConstraint.activate([
-            contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: horizontalPadding),
+            contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -horizontalPadding),
             contentStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            iconView.widthAnchor.constraint(equalToConstant: 32),
-            iconView.heightAnchor.constraint(equalToConstant: 32)
+            iconView.widthAnchor.constraint(equalToConstant: iconSize),
+            iconView.heightAnchor.constraint(equalToConstant: iconSize)
         ])
     }
 
@@ -47,6 +54,10 @@ final class FeedbackPanelController {
         iconView.isHidden = icon == nil
         messageLabel.stringValue = message
         messageLabel.alignment = icon == nil ? .center : .left
+        let iconWidth = icon == nil ? 0 : iconSize + contentSpacing
+        let desiredWidth = (horizontalPadding * 2) + iconWidth + messageLabel.intrinsicContentSize.width
+        let panelWidth = min(max(desiredWidth.rounded(.up), minPanelWidth), maxPanelWidth)
+        panel.setContentSize(NSSize(width: panelWidth, height: panelHeight))
         panel.center()
         panel.orderFrontRegardless()
 
