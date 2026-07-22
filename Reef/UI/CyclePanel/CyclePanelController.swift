@@ -84,18 +84,17 @@ final class CyclePanelController: NSObject {
     }
 
     private func positionPanel() {
-        guard UserDefaults.standard.bool(forKey: showOnPrimaryDisplayDefaultsKey) else {
+        // Before Reef activates, main follows the focused window; the first screen is primary.
+        let targetScreen = UserDefaults.standard.bool(forKey: showOnPrimaryDisplayDefaultsKey)
+            ? NSScreen.screens.first
+            : NSScreen.main
+
+        guard let targetScreen else {
             panel.center()
             return
         }
 
-        // NSScreen.main follows keyboard focus; the first screen is the primary/menu-bar display.
-        guard let primaryScreen = NSScreen.screens.first else {
-            panel.center()
-            return
-        }
-
-        panel.setFrameOrigin(Self.centeredOrigin(for: panel.frame.size, in: primaryScreen.visibleFrame))
+        panel.setFrameOrigin(Self.centeredOrigin(for: panel.frame.size, in: targetScreen.visibleFrame))
     }
 
     static func centeredOrigin(for panelSize: CGSize, in visibleFrame: CGRect) -> CGPoint {
