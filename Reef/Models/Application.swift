@@ -267,6 +267,11 @@ class Application {
         var windows = axWindows.map { axWindow in
             Window(axWindow, self)
         }
+
+        // cmux exposes menu-bar and rendering helpers as windows.
+        if bundleIdentifier == "com.cmuxterm.app" {
+            windows.removeAll { $0.subrole != .standardWindow }
+        }
         
         // Finder can expose a trailing generic "Finder" window that is not useful for switching.
         if bundleIdentifier == "com.apple.finder",

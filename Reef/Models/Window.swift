@@ -20,6 +20,10 @@ class Window: Identifiable {
         self.cgWindowID = element.getWindowID()
         self.application = application
     }
+
+    var subrole: NSAccessibility.Subrole? {
+        element.getAttributeValue(.subrole)
+    }
     
     var title: String {
         if let title: String = self.element.getAttributeValue(.title) {
