@@ -263,7 +263,10 @@ class Application {
     }
     
     func getWindows() -> [Window] {
-        let axWindows = self.getAXWindows()
+        let axWindows = self.getAXWindows().filter { element in
+            let role: NSAccessibility.Role? = element.getAttributeValue(.role)
+            return Window.isWindowRole(role)
+        }
         var windows = axWindows.map { axWindow in
             Window(axWindow, self)
         }

@@ -21,6 +21,10 @@ class Window: Identifiable {
         self.application = application
     }
 
+    static func isWindowRole(_ role: NSAccessibility.Role?) -> Bool {
+        role == .window
+    }
+
     var subrole: NSAccessibility.Subrole? {
         element.getAttributeValue(.subrole)
     }

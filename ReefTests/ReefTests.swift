@@ -16,6 +16,13 @@ struct ReefTests {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
     }
 
+    @Test func onlyWindowRoleIsAccepted() {
+        #expect(Window.isWindowRole(.window))
+        #expect(!Window.isWindowRole(.application))
+        #expect(!Window.isWindowRole(.scrollArea))
+        #expect(!Window.isWindowRole(nil))
+    }
+
     @MainActor
     @Test func cyclePanelCentersWithinOffsetVisibleFrame() {
         let visibleFrame = CGRect(x: -1920, y: 25, width: 1920, height: 1055)
